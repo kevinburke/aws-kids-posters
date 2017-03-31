@@ -1,3 +1,19 @@
 p {
     font-family: 'Helvetica Neue Light', Helvetica, Arial, sans-serif;
 }
+
+.body-container {
+    max-width: 1200px;
+}
+
+.bedroom-photo {
+    max-width: 700px;
+}
+
+.bedroom-photo img {
+    width: 100%;
+}
+
+.subheading-img {
+    width: 100%;
+}
