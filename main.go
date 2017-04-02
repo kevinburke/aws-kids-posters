@@ -40,6 +40,26 @@ func (s *static) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	http.ServeContent(w, r, r.URL.Path, s.modTime, bytes.NewReader(bits))
 }
+func SecurityMiddleware(next http.Handler) http.Handler {
+	mw := func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload")
+		next.ServeHTTP(w, r)
+	}
+	return http.HandlerFunc(mw)
+}
+
+func EnforceTLSMiddleware(next http.Handler) http.Handler {
+	mw := func(w http.ResponseWriter, r *http.Request) {
+		if r.Header.Get("X-Forwarded-Proto") == "http" {
+			r.URL.Scheme = "https"
+			r.URL.Host = "awskids.club"
+			http.Redirect(w, r, r.URL.String(), http.StatusTemporaryRedirect)
+			return
+		}
+		next.ServeHTTP(w, r)
+	}
+	return http.HandlerFunc(mw)
+}
 
 func main() {
 	staticServer := &static{
@@ -63,5 +83,10 @@ func main() {
 		log.Fatal(err)
 	}
 	log.Println("Listening on port", port)
-	http.Serve(ln, handlers.Log(r))
+
+	mux := handlers.Log(r)
+	mux = SecurityMiddleware(mux)
+	mux = EnforceTLSMiddleware(mux)
+
+	http.Serve(ln, mux)
 }
