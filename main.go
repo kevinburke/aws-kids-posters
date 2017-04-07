@@ -50,12 +50,6 @@ func SecurityMiddleware(next http.Handler) http.Handler {
 
 func EnforceTLSMiddleware(next http.Handler) http.Handler {
 	mw := func(w http.ResponseWriter, r *http.Request) {
-		if r.Header.Get("X-Forwarded-Proto") == "http" {
-			r.URL.Scheme = "https"
-			r.URL.Host = "awskids.club"
-			http.Redirect(w, r, r.URL.String(), http.StatusTemporaryRedirect)
-			return
-		}
 		next.ServeHTTP(w, r)
 	}
 	return http.HandlerFunc(mw)
