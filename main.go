@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"flag"
 	"html/template"
 	"log"
 	"net"
@@ -56,6 +57,7 @@ func EnforceTLSMiddleware(next http.Handler) http.Handler {
 }
 
 func main() {
+	flag.Parse()
 	staticServer := &static{
 		modTime: time.Now().UTC(),
 	}
